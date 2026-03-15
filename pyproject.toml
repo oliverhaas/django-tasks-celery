@@ -126,6 +126,11 @@ module = "celery.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+module = "django.tasks.*"
+ignore_missing_imports = true
+follow_untyped_imports = false
+
+[[tool.mypy.overrides]]
 module = "testcontainers.*"
 ignore_missing_imports = true
 
@@ -137,6 +142,13 @@ python-version = "3.13"
 
 [tool.ty.analysis]
 respect-type-ignore-comments = false
+
+[[tool.ty.overrides]]
+include = ["django_tasks_celery/compat.py"]
+
+[tool.ty.overrides.rules]
+# django.tasks is new in Django 6.0 and not yet recognized by ty
+unresolved-import = "ignore"
 
 [[tool.ty.overrides]]
 include = ["tests/**"]

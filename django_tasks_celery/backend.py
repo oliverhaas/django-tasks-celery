@@ -35,7 +35,7 @@ class CeleryBackend(BaseTaskBackend):
     supports_priority = True
 
     @property
-    def supports_get_result(self) -> bool:  # type: ignore[override]
+    def supports_get_result(self) -> bool:
         try:
             from celery.backends.base import DisabledBackend
 
