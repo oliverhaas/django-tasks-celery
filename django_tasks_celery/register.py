@@ -34,11 +34,24 @@ def ensure_celery_task(task: Task[..., Any], celery_app: Any, backend: CeleryBac
         return
     _django_task_registry[celery_name] = task
     run_fn = _make_run_fn(task, backend)
-    _register_shared(celery_name, run_fn)
+    _register_on_app(celery_name, run_fn, celery_app)
+    _register_on_future_apps(celery_name, run_fn)
 
 
-def _register_shared(celery_name: str, run_fn: Any) -> None:
-    """Register task with all current and future Celery apps."""
+def _register_on_app(celery_name: str, run_fn: Any, app: Any) -> None:
+    """Register task on a specific Celery app."""
+    if celery_name in app.tasks:
+        return
+    if app.finalized:
+        with app._finalize_mutex:
+            if celery_name not in app.tasks:
+                app._task_from_fun(run_fn, name=celery_name, serializer="json")
+    else:
+        app._task_from_fun(run_fn, name=celery_name, serializer="json")
+
+
+def _register_on_future_apps(celery_name: str, run_fn: Any) -> None:
+    """Register task on any future Celery apps via connect_on_app_finalize."""
 
     def _register(app: Any) -> None:
         if celery_name in app.tasks:
@@ -46,10 +59,6 @@ def _register_shared(celery_name: str, run_fn: Any) -> None:
         app._task_from_fun(run_fn, name=celery_name, serializer="json")
 
     _state.connect_on_app_finalize(_register)
-    for app in _state._get_active_apps():
-        if app.finalized:
-            with app._finalize_mutex:
-                _register(app)
 
 
 def _make_run_fn(task: Task[..., Any], backend: CeleryBackend) -> Any:

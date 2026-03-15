@@ -1,4 +1,4 @@
-"""Re-exports from django.tasks for convenient internal use."""
+"""Re-exports from django.tasks with stable names for internal and public use."""
 
 from __future__ import annotations
 

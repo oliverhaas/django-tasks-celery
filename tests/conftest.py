@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-from tests.fixtures.celery import celery_app  # noqa: F401
+pytest_plugins = ["celery.contrib.pytest"]

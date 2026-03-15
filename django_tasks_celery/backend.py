@@ -53,7 +53,11 @@ class CeleryBackend(BaseTaskBackend):
         return current_app._get_current_object()
 
     def _build_send_options(self, task: Task[..., Any]) -> dict[str, Any]:
-        """Build options dict for Celery's send_task()."""
+        """Build options dict for Celery's apply_async().
+
+        When queue_name is "default" (Django's default), we omit it so Celery
+        uses its own default routing. Non-default queues are passed explicitly.
+        """
         options: dict[str, Any] = {}
 
         if task.queue_name != "default":
@@ -111,11 +115,20 @@ class CeleryBackend(BaseTaskBackend):
         return await sync_to_async(self.enqueue, thread_sensitive=True)(task=task, args=args, kwargs=kwargs)
 
     def get_result(self, result_id: str) -> TaskResult[Any]:
+        from django_tasks_celery.register import _django_task_registry
+
         app = self._get_celery_app()
         meta = app.backend.get_task_meta(result_id)
+
+        # Look up the Django Task from our registry via the Celery task name
+        # (requires CELERY_RESULT_EXTENDED = True for task_name in metadata)
+        task_name = meta.get("task_name") or meta.get("name")
+        task = _django_task_registry.get(task_name) if task_name else None
+
         return meta_to_task_result(
             result_id=result_id,
             meta=meta,
+            task=task,
             backend_alias=self.alias,
         )
 
