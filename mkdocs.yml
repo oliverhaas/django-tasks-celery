@@ -1,0 +1,45 @@
+site_name: django-tasks-celery
+site_description: Celery backend for Django's task framework
+repo_url: https://github.com/oliverhaas/django-tasks-celery
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tracking
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+
+extra:
+  version:
+    provider: mike
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - User Guide:
+      - Configuration: user-guide/configuration.md
+  - Reference:
+      - API: reference/api.md
+      - Changelog: reference/changelog.md

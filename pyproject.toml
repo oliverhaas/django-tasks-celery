@@ -1,0 +1,161 @@
+[project]
+name = "django-tasks-celery"
+version = "0.1.0"
+description = "Celery backend for Django's task framework"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+keywords = ["django", "celery", "tasks", "backend", "queue"]
+authors = [{ name = "Oliver Haas", email = "ohaas@e1plus.de" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Web Environment",
+  "Framework :: Django",
+  "Framework :: Django :: 6.0",
+  "Framework :: Celery",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Libraries",
+  "Typing :: Typed",
+]
+dependencies = ["Django>=6.0,<7", "celery>=5.4,<6"]
+
+[project.urls]
+Homepage = "https://github.com/oliverhaas/django-tasks-celery"
+Documentation = "https://oliverhaas.github.io/django-tasks-celery/"
+Repository = "https://github.com/oliverhaas/django-tasks-celery.git"
+Changelog = "https://oliverhaas.github.io/django-tasks-celery/reference/changelog/"
+
+[dependency-groups]
+dev = [
+  "django-stubs==5.2.9",
+  "mypy==1.19.1",
+  "pre-commit==4.5.1",
+  "pytest-cov==7.0.0",
+  "pytest-django==4.12.0",
+  "pytest-mock==3.15.1",
+  "pytest==9.0.2",
+  "ruff==0.15.5",
+  "testcontainers[redis]==4.14.1",
+  "ty==0.0.21",
+]
+docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.3", "mike==2.1.3"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["django_tasks_celery"]
+
+[tool.hatch.build.targets.sdist]
+include = ["django_tasks_celery", "LICENSE", "README.md"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+fix = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN401",  # Any is correct for task args/kwargs and Celery internals
+  "ARG001",  # Unused args: API compat (celery_app in ensure_celery_task reserved for future use)
+  "ARG002",  # Unused args: API compat with BaseTaskBackend
+  "BLE001",  # Broad exception catching needed for resilient check() and supports_get_result
+  "COM812",  # Conflicts with ruff-format
+  "D",       # Docstrings - will add incrementally
+  "E501",    # Line length handled by config
+  "EM",      # Exception strings inline are fine
+  "FBT",     # Boolean params match django-tasks API (takes_context, etc.)
+  "PLC0415", # Dynamic imports intentional (Celery availability checks, lazy loading)
+  "PLR0913", # Too many args - task functions can have many parameters
+  "PLR2004", # Magic values like 255 for priority mapping are documented constants
+  "SIM105",  # try/except/pass is clearer than contextlib.suppress for date parsing
+  "SLF001",  # Private member access needed for Celery internals (_state, _task_from_fun)
+  "TC001",   # Type-only imports: compat layer re-exports need runtime access
+  "TC003",   # Type-only imports: needed at runtime for check() return type
+  "TRY003",  # Long exception messages are helpful for debugging
+  "TRY300",  # return in try block is cleaner for task execution pattern
+]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+suppress-none-returning = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "ANN",    # Type annotations not required in tests
+  "ARG",    # Unused arguments common in fixtures
+  "DTZ005", # Timezone-naive datetime okay in tests
+  "F841",   # Unused variables okay in tests
+  "FBT",    # Boolean args fine in test fixtures and test calls
+  "PT006",  # Parametrize tuple style is preference
+  "PT011",  # Broad pytest.raises okay in some tests
+  "PT013",  # pytest import style is preference
+  "PT018",  # Compound assertions okay in tests
+  "RUF002", # Unicode in docstrings is fine
+  "RUF015", # next(iter()) vs slice is preference
+  "S101",   # assert in tests
+  "S105",   # Hardcoded passwords in test settings
+  "S311",   # random is fine for tests
+]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+pretty = true
+show_error_codes = true
+show_error_context = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = false
+
+[tool.django-stubs]
+django_settings_module = "tests.settings.base"
+
+[[tool.mypy.overrides]]
+module = "celery.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "testcontainers.*"
+ignore_missing_imports = true
+
+[tool.ty.rules]
+invalid-method-override = "ignore"
+
+[tool.ty.environment]
+python-version = "3.13"
+
+[tool.ty.analysis]
+respect-type-ignore-comments = false
+
+[[tool.ty.overrides]]
+include = ["tests/**"]
+
+[tool.ty.overrides.rules]
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "settings.base"
+addopts = "--cov=django_tasks_celery --cov-report=term-missing --cov-report=xml --no-cov-on-fail"
+pythonpath = ["tests"]
+testpaths = ["tests"]
+xfail_strict = true
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+precision = 2
+skip_covered = true
