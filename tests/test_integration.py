@@ -158,3 +158,12 @@ class TestWorkerGetResult:
 
         task_result = backend.get_result(result.id)
         assert task_result.task is simple_task
+
+    def test_result_has_return_value(self, backend, celery_app, celery_worker):
+        """get_result populates return_value from Celery result metadata."""
+        result = backend.enqueue(simple_task, args=(10, 20), kwargs={})
+        celery_app.AsyncResult(result.id).get(timeout=10)
+
+        task_result = backend.get_result(result.id)
+        assert task_result.status == TaskResultStatus.SUCCESSFUL
+        assert task_result.return_value == 30

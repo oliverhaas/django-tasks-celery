@@ -60,7 +60,7 @@ def meta_to_task_result(
         elif isinstance(date_done, datetime):
             finished_at = date_done if date_done.tzinfo else date_done.replace(tzinfo=UTC)
 
-    return TaskResult(
+    result = TaskResult(
         task=task,
         id=result_id,
         status=status,
@@ -74,3 +74,10 @@ def meta_to_task_result(
         errors=errors,
         worker_ids=[],
     )
+
+    # _return_value is init=False on the frozen dataclass, so we must use
+    # object.__setattr__ to set it after construction.
+    if status == TaskResultStatus.SUCCESSFUL and "result" in meta:
+        object.__setattr__(result, "_return_value", meta["result"])
+
+    return result
