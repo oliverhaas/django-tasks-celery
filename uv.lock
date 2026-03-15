@@ -432,7 +432,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "celery", marker = "extra == 'celery'", specifier = ">=5.4,<6" },
-    { name = "celery-asyncio", marker = "extra == 'celery-asyncio'", specifier = ">=0.1" },
+    { name = "celery-asyncio", marker = "extra == 'celery-asyncio'", specifier = ">=6.0.0a1" },
     { name = "django", specifier = ">=6.0,<7" },
 ]
 provides-extras = ["celery", "celery-asyncio"]
