@@ -1,6 +1,10 @@
 version = 1
 revision = 3
 requires-python = ">=3.12"
+resolution-markers = [
+    "python_full_version >= '3.14'",
+    "python_full_version < '3.14'",
+]
 
 [[package]]
 name = "amqp"
@@ -73,6 +77,51 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8f/9d/3d13596519cfa7207a6f9834f4b082554845eb3cd2684b5f8535d50c7c44/celery-5.6.2.tar.gz", hash = "sha256:4a8921c3fcf2ad76317d3b29020772103581ed2454c4c042cc55dcc43585009b", size = 1718802, upload-time = "2026-01-04T12:35:58.012Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/dd/bd/9ecd619e456ae4ba73b6583cc313f26152afae13e9a82ac4fe7f8856bfd1/celery-5.6.2-py3-none-any.whl", hash = "sha256:3ffafacbe056951b629c7abcf9064c4a2366de0bdfc9fdba421b97ebb68619a5", size = 445502, upload-time = "2026-01-04T12:35:55.894Z" },
+]
+
+[[package]]
+name = "celery-asyncio"
+version = "6.0.0a1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.14'",
+]
+dependencies = [
+    { name = "billiard", marker = "python_full_version < '3.14'" },
+    { name = "click", marker = "python_full_version < '3.14'" },
+    { name = "click-didyoumean", marker = "python_full_version < '3.14'" },
+    { name = "click-plugins", marker = "python_full_version < '3.14'" },
+    { name = "click-repl", marker = "python_full_version < '3.14'" },
+    { name = "kombu-asyncio", version = "6.0.0a1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
+    { name = "python-dateutil", marker = "python_full_version < '3.14'" },
+    { name = "tzlocal", marker = "python_full_version < '3.14'" },
+    { name = "vine", marker = "python_full_version < '3.14'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6f/0e/541f543684d91f7b8a3e85c86561dbb6c43b1ab0815c38675253ac95b1d7/celery_asyncio-6.0.0a1.tar.gz", hash = "sha256:e8c32a029b19fdad3be52a5ff8e075f583019b8fa6947d2a3ce952b3e1bd87db", size = 1731663, upload-time = "2026-01-05T18:58:42.096Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fd/2b/09af2146c3592cf1268abf04b54ef45626cb8bd1a44b986264a6a448cdad/celery_asyncio-6.0.0a1-py3-none-any.whl", hash = "sha256:549ca997d93f58b8d8d18e784ca4c917e4b36f9850b51d7391ee367e39d4557d", size = 448661, upload-time = "2026-01-05T18:58:39.138Z" },
+]
+
+[[package]]
+name = "celery-asyncio"
+version = "6.0.0a2"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14'",
+]
+dependencies = [
+    { name = "asgiref", marker = "python_full_version >= '3.14'" },
+    { name = "click", marker = "python_full_version >= '3.14'" },
+    { name = "click-didyoumean", marker = "python_full_version >= '3.14'" },
+    { name = "click-plugins", marker = "python_full_version >= '3.14'" },
+    { name = "click-repl", marker = "python_full_version >= '3.14'" },
+    { name = "kombu-asyncio", version = "6.0.0a2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
+    { name = "python-dateutil", marker = "python_full_version >= '3.14'" },
+    { name = "tzlocal", marker = "python_full_version >= '3.14'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bc/b6/d15e3ac5e64528d0c6c90aa4ddab89dba7812fe3d00158b9f78428361b3c/celery_asyncio-6.0.0a2.tar.gz", hash = "sha256:4f6a2be7083a4acd57aa77b05ca8ddada0d05b2471f6bb7e16c3472204f71d95", size = 305548, upload-time = "2026-03-14T12:22:37.068Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/6a/2db22d55ddc0a3c66f9a65ad027cf4a71b343ea91d66ec9d52490937d9d3/celery_asyncio-6.0.0a2-py3-none-any.whl", hash = "sha256:e251c02bfe3b6065b606d7eabc2943c2a369b35b64f589e428f34681453b338b", size = 352527, upload-time = "2026-03-14T12:22:35.222Z" },
 ]
 
 [[package]]
@@ -348,12 +397,21 @@ name = "django-tasks-celery"
 version = "0.1.0a2"
 source = { editable = "." }
 dependencies = [
-    { name = "celery" },
     { name = "django" },
+]
+
+[package.optional-dependencies]
+celery = [
+    { name = "celery" },
+]
+celery-asyncio = [
+    { name = "celery-asyncio", version = "6.0.0a1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14'" },
+    { name = "celery-asyncio", version = "6.0.0a2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14'" },
 ]
 
 [package.dev-dependencies]
 dev = [
+    { name = "celery" },
     { name = "django-stubs" },
     { name = "mypy" },
     { name = "pre-commit" },
@@ -373,12 +431,15 @@ docs = [
 
 [package.metadata]
 requires-dist = [
-    { name = "celery", specifier = ">=5.4,<6" },
+    { name = "celery", marker = "extra == 'celery'", specifier = ">=5.4,<6" },
+    { name = "celery-asyncio", marker = "extra == 'celery-asyncio'", specifier = ">=0.1" },
     { name = "django", specifier = ">=6.0,<7" },
 ]
+provides-extras = ["celery", "celery-asyncio"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "celery", specifier = ">=5.4,<6" },
     { name = "django-stubs", specifier = "==5.2.9" },
     { name = "mypy", specifier = "==1.19.1" },
     { name = "pre-commit", specifier = "==4.5.1" },
@@ -504,6 +565,33 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b6/a5/607e533ed6c83ae1a696969b8e1c137dfebd5759a2e9682e26ff1b97740b/kombu-5.6.2.tar.gz", hash = "sha256:8060497058066c6f5aed7c26d7cd0d3b574990b09de842a8c5aaed0b92cc5a55", size = 472594, upload-time = "2025-12-29T20:30:07.779Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fb/0f/834427d8c03ff1d7e867d3db3d176470c64871753252b21b4f4897d1fa45/kombu-5.6.2-py3-none-any.whl", hash = "sha256:efcfc559da324d41d61ca311b0c64965ea35b4c55cc04ee36e55386145dace93", size = 214219, upload-time = "2025-12-29T20:30:05.74Z" },
+]
+
+[[package]]
+name = "kombu-asyncio"
+version = "6.0.0a1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version < '3.14'",
+]
+dependencies = [
+    { name = "redis", marker = "python_full_version < '3.14'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ae/ea/1fa9d91eb8bade5e92cf6e4ae615be32822d8f1b0803f9b71dcd5fa0817f/kombu_asyncio-6.0.0a1.tar.gz", hash = "sha256:1aeb045beeef02bcfa4a341b85f4d2900168ae4a251384612a19f60ab4638a03", size = 445848, upload-time = "2026-01-05T12:14:32.086Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/1c/4d300e03855eed1c4d41dd60819fa24dabd0788c71bbea110bacc0d1b637/kombu_asyncio-6.0.0a1-py3-none-any.whl", hash = "sha256:e17c8eb0825e271b5b5b08db4e753c6faff820cfb9e9be4c385fb636ad977e24", size = 188230, upload-time = "2026-01-05T12:14:29.971Z" },
+]
+
+[[package]]
+name = "kombu-asyncio"
+version = "6.0.0a2"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.14'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8a/81/1978b6712494215b0ae62c7b046473d969d6a4a32450e6ec73cc10ad8992/kombu_asyncio-6.0.0a2.tar.gz", hash = "sha256:8bff8209c53bb33103a145c0cddbfb46dcf0ffe8444bcf13315d392d3e5cef53", size = 133679, upload-time = "2026-03-14T12:34:32.526Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/37/21eac1d5fc8ce5c7784e572fd22898af1772e4716d40dcd70a6186f6b47f/kombu_asyncio-6.0.0a2-py3-none-any.whl", hash = "sha256:52df96ffece48e9d49e613dc2dd4ebb2a45b479fbfe485ae80ce6675c3b26423", size = 113712, upload-time = "2026-03-14T12:34:31.269Z" },
 ]
 
 [[package]]

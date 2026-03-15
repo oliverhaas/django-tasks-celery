@@ -7,7 +7,13 @@ Celery backend for Django 6.0's built-in `django.tasks` framework. Implements `B
 ## Installation
 
 ```bash
-pip install django-tasks-celery
+pip install django-tasks-celery[celery]
+```
+
+Or with [celery-asyncio](https://github.com/oliverhaas/celery-asyncio) (same API, async-native rewrite):
+
+```bash
+pip install django-tasks-celery[celery-asyncio]
 ```
 
 ## Configuration
@@ -42,5 +48,5 @@ result = send_email.enqueue(to="user@example.com", subject="Hello", body="World"
 ## Compatibility
 
 - **Django**: 6.0+
-- **Celery**: 5.4+
+- **Celery**: 5.4+ (or celery-asyncio)
 - **Python**: 3.12+
