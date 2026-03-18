@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import inspect
 import logging
-import threading
 import traceback
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -21,19 +20,21 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 _django_task_registry: dict[str, Task[..., Any]] = {}
-_registry_lock = threading.Lock()
 
 
 def ensure_celery_task(task: Task[..., Any], celery_app: Any, backend: CeleryBackend) -> None:
-    """Register a Django @task as a Celery task if not already registered."""
+    """Register a Django @task as a Celery task if not already registered.
+
+    All operations are idempotent, so concurrent calls for the same task are safe
+    without locking — at worst a duplicate (harmless) callback is registered.
+    """
     celery_name = task.module_path
-    with _registry_lock:
-        if celery_name in _django_task_registry:
-            return
-        _django_task_registry[celery_name] = task
-        run_fn = _make_run_fn(task, backend)
-        _register_on_app(celery_name, run_fn, celery_app)
-        _register_on_future_apps(celery_name, run_fn)
+    if celery_name in _django_task_registry:
+        return
+    _django_task_registry[celery_name] = task
+    run_fn = _make_run_fn(task, backend)
+    _register_on_app(celery_name, run_fn, celery_app)
+    _register_on_future_apps(celery_name, run_fn)
 
 
 def _register_on_app(celery_name: str, run_fn: Any, app: Any) -> None:
