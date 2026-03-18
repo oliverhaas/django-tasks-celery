@@ -6,7 +6,6 @@ from collections.abc import Iterable
 from datetime import UTC, datetime
 from typing import Any, ParamSpec, TypeVar
 
-from asgiref.sync import sync_to_async
 from django.core import checks
 from django.utils.module_loading import import_string
 
@@ -51,6 +50,22 @@ class CeleryBackend(BaseTaskBackend):
         from celery import current_app
 
         return current_app._get_current_object()
+
+    def validate_task(self, task: Task[..., Any]) -> None:
+        """Validate and register the task with Celery.
+
+        This runs during Task.__post_init__ (at import time), ensuring tasks
+        are registered with Celery in both web and worker processes — solving
+        worker-side task discovery.
+        """
+        super().validate_task(task)
+        try:
+            app = self._get_celery_app()
+            ensure_celery_task(task, app, self)
+        except Exception:
+            # Registration is best-effort at validate time.
+            # It will succeed later at enqueue() time.
+            pass
 
     def _build_send_options(self, task: Task[..., Any]) -> dict[str, Any]:
         """Build options dict for Celery's apply_async().
@@ -106,14 +121,6 @@ class CeleryBackend(BaseTaskBackend):
         task_enqueued.send(sender=type(self), task_result=task_result)
         return task_result
 
-    async def aenqueue(
-        self,
-        task: Task[P, T],
-        args: Any,
-        kwargs: Any,
-    ) -> TaskResult[T]:
-        return await sync_to_async(self.enqueue, thread_sensitive=True)(task=task, args=args, kwargs=kwargs)
-
     def get_result(self, result_id: str) -> TaskResult[Any]:
         from django_tasks_celery.register import _django_task_registry
 
@@ -132,28 +139,11 @@ class CeleryBackend(BaseTaskBackend):
             backend_alias=self.alias,
         )
 
-    async def aget_result(self, result_id: str) -> TaskResult[Any]:
-        return await sync_to_async(self.get_result, thread_sensitive=True)(
-            result_id=result_id,
-        )
-
     def check(self, **kwargs: Any) -> Iterable[checks.CheckMessage]:
         messages: list[checks.CheckMessage] = []
 
         try:
-            import celery  # noqa: F401
-        except ImportError:
-            messages.append(
-                checks.Error(
-                    "celery is not installed.",
-                    hint="Install celery: pip install celery",
-                    id="django_tasks_celery.E001",
-                ),
-            )
-            return messages
-
-        try:
-            self._get_celery_app()
+            app = self._get_celery_app()
         except Exception as e:
             messages.append(
                 checks.Error(
@@ -170,6 +160,15 @@ class CeleryBackend(BaseTaskBackend):
                     "Celery result backend is disabled. get_result() will not work.",
                     hint="Set CELERY_RESULT_BACKEND in your Django settings.",
                     id="django_tasks_celery.W001",
+                ),
+            )
+
+        if not app.conf.get("result_extended", False):
+            messages.append(
+                checks.Warning(
+                    "CELERY_RESULT_EXTENDED is not enabled. get_result() will not be able to resolve task references.",
+                    hint="Set CELERY_RESULT_EXTENDED = True in your Django settings.",
+                    id="django_tasks_celery.W002",
                 ),
             )
 

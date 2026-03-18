@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 import pytest
 from celery import Celery
 
@@ -54,3 +56,20 @@ class TestEnsureCeleryTask:
     def test_registers_async_task(self, celery_app, backend):
         ensure_celery_task(async_task, celery_app, backend)
         assert async_task.module_path in celery_app.tasks
+
+
+class TestAutoRegistration:
+    """Tasks should be auto-registered with Celery during validate_task (worker discovery)."""
+
+    def test_validate_task_registers_with_celery(self, celery_app, backend):
+        """validate_task() should register the task with Celery so workers discover tasks
+        at import time, not only when enqueue() is called."""
+        with patch.object(backend, "_get_celery_app", return_value=celery_app):
+            backend.validate_task(simple_task)
+        assert simple_task.module_path in celery_app.tasks
+
+    def test_validate_task_registration_survives_celery_app_error(self, backend):
+        """If the Celery app isn't available during validate_task, it should not crash."""
+        with patch.object(backend, "_get_celery_app", side_effect=RuntimeError("no app")):
+            # Should not raise — validation still works, registration is best-effort
+            backend.validate_task(simple_task)

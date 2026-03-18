@@ -60,6 +60,12 @@ def meta_to_task_result(
         elif isinstance(date_done, datetime):
             finished_at = date_done if date_done.tzinfo else date_done.replace(tzinfo=UTC)
 
+    # Extract args, kwargs, worker from extended metadata
+    args = list(meta.get("args") or [])
+    kwargs = dict(meta.get("kwargs") or {})
+    worker = meta.get("worker")
+    worker_ids = [worker] if worker else []
+
     result = TaskResult(
         task=task,
         id=result_id,
@@ -68,11 +74,11 @@ def meta_to_task_result(
         started_at=None,
         finished_at=finished_at,
         last_attempted_at=None,
-        args=[],
-        kwargs={},
+        args=args,
+        kwargs=kwargs,
         backend=backend_alias,
         errors=errors,
-        worker_ids=[],
+        worker_ids=worker_ids,
     )
 
     # _return_value is init=False on the frozen dataclass, so we must use

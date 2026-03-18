@@ -66,6 +66,8 @@ def _make_run_fn(task: Task[..., Any], backend: CeleryBackend) -> Any:
 
     def run(*args: Any, **kwargs: Any) -> Any:
         result_id = current_task.request.id if current_task else "unknown"
+        worker_hostname = current_task.request.hostname if current_task else None
+        worker_ids = [worker_hostname] if worker_hostname else []
         now = datetime.now(UTC)
 
         task_result = TaskResult(
@@ -80,7 +82,7 @@ def _make_run_fn(task: Task[..., Any], backend: CeleryBackend) -> Any:
             kwargs=dict(kwargs),
             backend=backend.alias,
             errors=[],
-            worker_ids=[],
+            worker_ids=worker_ids,
         )
 
         task_started.send(sender=type(backend), task_result=task_result)
@@ -102,6 +104,7 @@ def _make_run_fn(task: Task[..., Any], backend: CeleryBackend) -> Any:
                 status=TaskResultStatus.SUCCESSFUL,
                 finished_at=datetime.now(UTC),
             )
+            object.__setattr__(task_result, "_return_value", return_value)
             task_finished.send(sender=type(backend), task_result=task_result)
             return return_value
 

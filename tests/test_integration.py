@@ -167,3 +167,27 @@ class TestWorkerGetResult:
         task_result = backend.get_result(result.id)
         assert task_result.status == TaskResultStatus.SUCCESSFUL
         assert task_result.return_value == 30
+
+    def test_result_has_args_kwargs(self, backend, celery_app, celery_worker):
+        """get_result should return the original args and kwargs."""
+        result = backend.enqueue(simple_task, args=(5, 3), kwargs={})
+        celery_app.AsyncResult(result.id).get(timeout=10)
+
+        task_result = backend.get_result(result.id)
+        assert task_result.args == [5, 3]
+        assert task_result.kwargs == {}
+
+    def test_result_has_worker_id(self, backend, celery_app, celery_worker):
+        """get_result should include the worker hostname."""
+        result = backend.enqueue(simple_task, args=(1, 1), kwargs={})
+        celery_app.AsyncResult(result.id).get(timeout=10)
+
+        task_result = backend.get_result(result.id)
+        assert len(task_result.worker_ids) == 1
+        assert isinstance(task_result.worker_ids[0], str)
+
+    def test_context_attempt_is_one(self, backend, celery_app, celery_worker):
+        """context.attempt should be 1 after first worker execution, not 0."""
+        result = backend.enqueue(context_task, args=(99,), kwargs={})
+        return_value = celery_app.AsyncResult(result.id).get(timeout=10)
+        assert return_value["attempt"] == 1

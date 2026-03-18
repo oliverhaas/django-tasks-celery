@@ -51,3 +51,35 @@ class TestSystemChecks:
             messages = list(backend.check())
         errors = [m for m in messages if m.id == "django_tasks_celery.E002"]
         assert len(errors) == 1
+
+    def test_warning_when_result_extended_disabled(self, backend):
+        """Should warn when CELERY_RESULT_EXTENDED is not enabled."""
+        app = Celery("test_no_extended")
+        app.config_from_object(
+            {
+                "broker_url": "memory://",
+                "result_backend": "cache+memory://",
+                "result_extended": False,
+            },
+        )
+        app.finalize()
+        with patch.object(backend, "_get_celery_app", return_value=app):
+            messages = list(backend.check())
+        warnings = [m for m in messages if m.id == "django_tasks_celery.W002"]
+        assert len(warnings) == 1
+
+    def test_no_warning_when_result_extended_enabled(self, backend):
+        """No W002 warning when result_extended is True."""
+        app = Celery("test_extended")
+        app.config_from_object(
+            {
+                "broker_url": "memory://",
+                "result_backend": "cache+memory://",
+                "result_extended": True,
+            },
+        )
+        app.finalize()
+        with patch.object(backend, "_get_celery_app", return_value=app):
+            messages = list(backend.check())
+        warnings = [m for m in messages if m.id == "django_tasks_celery.W002"]
+        assert len(warnings) == 0

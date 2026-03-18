@@ -95,3 +95,36 @@ class TestSignals:
             assert len(received[0][2]) == 1
         finally:
             task_finished.disconnect(finished_handler)
+
+    def test_finished_signal_has_return_value(self, backend, celery_app):
+        """task_finished signal's TaskResult should have return_value accessible."""
+        received_values = []
+
+        def finished_handler(sender, task_result, **kwargs):
+            if task_result.status == TaskResultStatus.SUCCESSFUL:
+                received_values.append(task_result.return_value)
+
+        task_finished.connect(finished_handler)
+        try:
+            with patch.object(backend, "_get_celery_app", return_value=celery_app):
+                backend.enqueue(simple_task, args=(3, 7), kwargs={})
+            assert received_values == [10]
+        finally:
+            task_finished.disconnect(finished_handler)
+
+    def test_started_signal_has_worker_id(self, backend, celery_app):
+        """task_started signal's TaskResult should have worker_ids populated."""
+        received_worker_ids = []
+
+        def started_handler(sender, task_result, **kwargs):
+            received_worker_ids.append(task_result.worker_ids)
+
+        task_started.connect(started_handler)
+        try:
+            with patch.object(backend, "_get_celery_app", return_value=celery_app):
+                backend.enqueue(simple_task, args=(1, 2), kwargs={})
+            assert len(received_worker_ids) == 1
+            # Worker IDs should not be empty — should contain the current worker hostname
+            assert len(received_worker_ids[0]) > 0
+        finally:
+            task_started.disconnect(started_handler)

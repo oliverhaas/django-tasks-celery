@@ -65,3 +65,28 @@ class TestMetaToTaskResult:
         meta = {"status": PENDING, "result": None}
         result = meta_to_task_result("abc-123", meta, backend_alias="celery")
         assert result.backend == "celery"
+
+    def test_success_meta_populates_return_value(self):
+        """Successful result should have return_value accessible."""
+        meta = {"status": SUCCESS, "result": 42}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.return_value == 42
+
+    def test_meta_populates_args_kwargs(self):
+        """Extended metadata args/kwargs should be reflected in TaskResult."""
+        meta = {"status": SUCCESS, "result": 42, "args": [1, 2], "kwargs": {"x": 3}}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.args == [1, 2]
+        assert result.kwargs == {"x": 3}
+
+    def test_meta_populates_worker_ids(self):
+        """Worker hostname from metadata should populate worker_ids."""
+        meta = {"status": SUCCESS, "result": 42, "worker": "celery@myhost"}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.worker_ids == ["celery@myhost"]
+
+    def test_meta_without_worker(self):
+        """Missing worker in metadata should leave worker_ids empty."""
+        meta = {"status": SUCCESS, "result": 42}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.worker_ids == []
