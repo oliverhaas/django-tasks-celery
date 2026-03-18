@@ -6,9 +6,10 @@ from unittest.mock import patch
 
 import pytest
 from celery import Celery
+from django.tasks.base import TaskResultStatus
+from django.tasks.signals import task_enqueued, task_finished, task_started
 
 from django_tasks_celery.backend import CeleryBackend
-from django_tasks_celery.compat import TaskResultStatus, task_enqueued, task_finished, task_started
 from django_tasks_celery.register import _django_task_registry
 from tests.tasks import failing_task, simple_task
 

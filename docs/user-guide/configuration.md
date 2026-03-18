@@ -12,7 +12,7 @@ TASKS = {
         "BACKEND": "django_tasks_celery.CeleryBackend",
         "QUEUES": ["default", "high", "low"],
         "OPTIONS": {
-            "celery_app": "myproject.celery.app",  # Optional: explicit Celery app path
+            "CELERY_APP": "myproject.celery.app",  # Optional: explicit Celery app path
         },
     },
 }
@@ -28,7 +28,7 @@ TASKS = {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `celery_app` | `str` | Auto-detect | Import path to the Celery app instance (e.g. `"myproject.celery.app"`). If omitted, uses `celery.current_app`. |
+| `CELERY_APP` | `str` | Auto-detect | Import path to the Celery app instance (e.g. `"myproject.celery.app"`). If omitted, uses `celery.current_app`. |
 
 ### Celery settings
 

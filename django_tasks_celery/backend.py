@@ -7,15 +7,11 @@ from datetime import UTC, datetime
 from typing import Any, ParamSpec, TypeVar
 
 from django.core import checks
+from django.tasks.backends.base import BaseTaskBackend
+from django.tasks.base import Task, TaskResult, TaskResultStatus
+from django.tasks.signals import task_enqueued
 from django.utils.module_loading import import_string
 
-from django_tasks_celery.compat import (
-    BaseTaskBackend,
-    Task,
-    TaskResult,
-    TaskResultStatus,
-    task_enqueued,
-)
 from django_tasks_celery.register import ensure_celery_task
 from django_tasks_celery.results import meta_to_task_result
 
@@ -44,7 +40,7 @@ class CeleryBackend(BaseTaskBackend):
 
     def _get_celery_app(self) -> Any:
         """Resolve the Celery app: from OPTIONS or auto-detect."""
-        celery_app_path = self.options.get("celery_app")
+        celery_app_path = self.options.get("CELERY_APP")
         if celery_app_path:
             return import_string(celery_app_path)
         from celery import current_app
@@ -148,7 +144,7 @@ class CeleryBackend(BaseTaskBackend):
             messages.append(
                 checks.Error(
                     f"Could not resolve Celery app: {e}",
-                    hint="Set OPTIONS.celery_app or configure a default Celery app.",
+                    hint="Set OPTIONS.CELERY_APP or configure a default Celery app.",
                     id="django_tasks_celery.E002",
                 ),
             )

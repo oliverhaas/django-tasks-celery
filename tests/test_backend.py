@@ -6,9 +6,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from celery import Celery
+from django.tasks.base import TaskResultStatus
+from django.tasks.exceptions import InvalidTask as InvalidTaskError
 
 from django_tasks_celery.backend import CeleryBackend
-from django_tasks_celery.compat import InvalidTaskError, TaskResultStatus
 from django_tasks_celery.register import _django_task_registry
 from tests.tasks import high_priority_task, simple_task
 
@@ -73,7 +74,7 @@ class TestCeleryBackendEnqueue:
         assert result.task == high_priority_task
 
     def test_enqueue_fires_signal(self, backend, celery_app):
-        from django_tasks_celery.compat import task_enqueued
+        from django.tasks.signals import task_enqueued
 
         received = []
 
@@ -136,7 +137,7 @@ class TestCeleryAppResolution:
         backend = CeleryBackend(
             alias="default",
             params={
-                "OPTIONS": {"celery_app": "tests.fixtures.celery_app_instance"},
+                "OPTIONS": {"CELERY_APP": "tests.fixtures.celery_app_instance"},
             },
         )
         # Just test that a bad path raises ImportError

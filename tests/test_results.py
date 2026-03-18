@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 from celery.states import FAILURE, PENDING, RECEIVED, RETRY, REVOKED, STARTED, SUCCESS
+from django.tasks.base import TaskResultStatus
 
-from django_tasks_celery.compat import TaskResultStatus
 from django_tasks_celery.results import map_celery_state, meta_to_task_result
 
 

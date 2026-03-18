@@ -10,16 +10,8 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from celery import _state, current_task
-
-from django_tasks_celery.compat import (
-    Task,
-    TaskContext,
-    TaskError,
-    TaskResult,
-    TaskResultStatus,
-    task_finished,
-    task_started,
-)
+from django.tasks.base import Task, TaskContext, TaskError, TaskResult, TaskResultStatus
+from django.tasks.signals import task_finished, task_started
 
 if TYPE_CHECKING:
     from django_tasks_celery.backend import CeleryBackend

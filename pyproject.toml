@@ -63,7 +63,7 @@ packages = ["django_tasks_celery"]
 include = ["django_tasks_celery", "LICENSE", "README.md"]
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py312"
 line-length = 120
 fix = true
 extend-exclude = ["examples"]
@@ -86,7 +86,7 @@ ignore = [
   "S110",    # try/except/pass: intentional for best-effort Celery registration in validate_task
   "SIM105",  # try/except/pass is clearer than contextlib.suppress for date parsing
   "SLF001",  # Private member access needed for Celery internals (_state, _task_from_fun)
-  "TC001",   # Type-only imports: compat layer re-exports need runtime access
+  "TC001",   # Type-only imports: django.tasks types needed at runtime
   "TC003",   # Type-only imports: needed at runtime for check() return type
   "TRY003",  # Long exception messages are helpful for debugging
   "TRY300",  # return in try block is cleaner for task execution pattern
@@ -150,10 +150,10 @@ python-version = "3.13"
 respect-type-ignore-comments = false
 
 [[tool.ty.overrides]]
-include = ["django_tasks_celery/compat.py"]
+# django.tasks is new in Django 6.0 and not yet recognized by ty
+include = ["django_tasks_celery/**"]
 
 [tool.ty.overrides.rules]
-# django.tasks is new in Django 6.0 and not yet recognized by ty
 unresolved-import = "ignore"
 
 [[tool.ty.overrides]]

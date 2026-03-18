@@ -30,7 +30,7 @@ app.conf.update(
 # Create backend and register tasks
 backend = CeleryBackend(
     alias="default",
-    params={"QUEUES": ["default"], "OPTIONS": {"celery_app": "celery_app.app"}},
+    params={"QUEUES": ["default"], "OPTIONS": {"CELERY_APP": "celery_app.app"}},
 )
 for t in [add, multiply, greet, failing_example]:
     ensure_celery_task(t, app, backend)

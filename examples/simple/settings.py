@@ -25,7 +25,7 @@ TASKS = {
         "BACKEND": "django_tasks_celery.CeleryBackend",
         "QUEUES": ["default"],
         "OPTIONS": {
-            "celery_app": "celery_app.app",
+            "CELERY_APP": "celery_app.app",
         },
     },
 }

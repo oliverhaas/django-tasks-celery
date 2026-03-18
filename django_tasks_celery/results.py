@@ -6,8 +6,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from celery.states import FAILURE, PENDING, RECEIVED, REJECTED, RETRY, REVOKED, STARTED, SUCCESS
-
-from django_tasks_celery.compat import Task, TaskError, TaskResult, TaskResultStatus
+from django.tasks.base import Task, TaskError, TaskResult, TaskResultStatus
 
 # Celery state → Django TaskResultStatus
 _STATE_MAP: dict[str, TaskResultStatus] = {
