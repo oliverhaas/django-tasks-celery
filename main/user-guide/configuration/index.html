@@ -832,7 +832,7 @@
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s2">&quot;django_tasks_celery.CeleryBackend&quot;</span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">&quot;QUEUES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">],</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="s2">&quot;celery_app&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject.celery.app&quot;</span><span class="p">,</span>  <span class="c1"># Optional: explicit Celery app path</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="s2">&quot;CELERY_APP&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject.celery.app&quot;</span><span class="p">,</span>  <span class="c1"># Optional: explicit Celery app path</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="p">},</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="p">},</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
@@ -871,7 +871,7 @@
 </thead>
 <tbody>
 <tr>
-<td><code>celery_app</code></td>
+<td><code>CELERY_APP</code></td>
 <td><code>str</code></td>
 <td>Auto-detect</td>
 <td>Import path to the Celery app instance (e.g. <code>"myproject.celery.app"</code>). If omitted, uses <code>celery.current_app</code>.</td>
