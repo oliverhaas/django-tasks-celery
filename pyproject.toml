@@ -99,9 +99,6 @@ allow-star-arg-any = true
 suppress-none-returning = true
 
 [tool.ruff.lint.per-file-ignores]
-"tests/redis_integration/**" = [
-  "INP001", # No __init__.py — would shadow the redis package since tests/ is in PYTHONPATH
-]
 "tests/**" = [
   "ANN",    # Type annotations not required in tests
   "ARG",    # Unused arguments common in fixtures
@@ -169,11 +166,10 @@ invalid-assignment = "ignore"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "settings.base"
-addopts = "--cov=django_tasks_celery --cov-report=term-missing --cov-report=xml --no-cov-on-fail -m 'not redis'"
+addopts = "--cov=django_tasks_celery --cov-report=term-missing --cov-report=xml --no-cov-on-fail"
 pythonpath = ["tests"]
 testpaths = ["tests"]
 xfail_strict = true
-markers = ["redis: tests requiring a real Redis instance (via testcontainers)"]
 
 [tool.coverage.run]
 omit = ["tests/*"]
