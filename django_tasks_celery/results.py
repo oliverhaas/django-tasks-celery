@@ -46,6 +46,14 @@ def meta_to_task_result(
                     traceback=meta.get("traceback", ""),
                 ),
             ]
+        elif isinstance(exc, str):
+            # Some result backends store exceptions as strings
+            errors = [
+                TaskError(
+                    exception_class_path=exc,
+                    traceback=meta.get("traceback", ""),
+                ),
+            ]
 
     # Extract timestamps from Celery's extended result metadata
     date_done = meta.get("date_done")

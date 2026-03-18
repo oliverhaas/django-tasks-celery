@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import asyncio
 import inspect
+import logging
+import threading
 import traceback
 from dataclasses import replace
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
+from asgiref.sync import async_to_sync
 from celery import _state, current_task
 from django.tasks.base import Task, TaskContext, TaskError, TaskResult, TaskResultStatus
 from django.tasks.signals import task_finished, task_started
@@ -16,18 +18,22 @@ from django.tasks.signals import task_finished, task_started
 if TYPE_CHECKING:
     from django_tasks_celery.backend import CeleryBackend
 
+logger = logging.getLogger(__name__)
+
 _django_task_registry: dict[str, Task[..., Any]] = {}
+_registry_lock = threading.Lock()
 
 
 def ensure_celery_task(task: Task[..., Any], celery_app: Any, backend: CeleryBackend) -> None:
     """Register a Django @task as a Celery task if not already registered."""
     celery_name = task.module_path
-    if celery_name in _django_task_registry:
-        return
-    _django_task_registry[celery_name] = task
-    run_fn = _make_run_fn(task, backend)
-    _register_on_app(celery_name, run_fn, celery_app)
-    _register_on_future_apps(celery_name, run_fn)
+    with _registry_lock:
+        if celery_name in _django_task_registry:
+            return
+        _django_task_registry[celery_name] = task
+        run_fn = _make_run_fn(task, backend)
+        _register_on_app(celery_name, run_fn, celery_app)
+        _register_on_future_apps(celery_name, run_fn)
 
 
 def _register_on_app(celery_name: str, run_fn: Any, app: Any) -> None:
@@ -87,7 +93,7 @@ def _make_run_fn(task: Task[..., Any], backend: CeleryBackend) -> Any:
 
             fn = task.func
             if inspect.iscoroutinefunction(fn):
-                return_value = asyncio.run(fn(*call_args, **kwargs))
+                return_value = async_to_sync(fn)(*call_args, **kwargs)
             else:
                 return_value = fn(*call_args, **kwargs)
 

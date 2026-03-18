@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -143,3 +144,30 @@ class TestCeleryAppResolution:
         # Just test that a bad path raises ImportError
         with pytest.raises(ImportError):
             backend._get_celery_app()
+
+
+class TestBuildSendOptions:
+    def test_run_after_sets_eta(self, backend):
+        """Tasks with run_after should pass eta to Celery."""
+        from datetime import datetime
+
+        eta = datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
+        deferred_task = simple_task.using(run_after=eta)
+        options = backend._build_send_options(deferred_task)
+        assert options["eta"] == eta
+
+    def test_default_queue_omitted(self, backend):
+        """Default queue should not be passed to Celery (let Celery decide)."""
+        options = backend._build_send_options(simple_task)
+        assert "queue" not in options
+
+    def test_non_default_queue_passed(self, backend):
+        """Non-default queue should be passed explicitly."""
+        task_with_queue = simple_task.using(queue_name="high")
+        options = backend._build_send_options(task_with_queue)
+        assert options["queue"] == "high"
+
+    def test_default_priority_omitted(self, backend):
+        """Default priority (0) should not be passed to Celery."""
+        options = backend._build_send_options(simple_task)
+        assert "priority" not in options

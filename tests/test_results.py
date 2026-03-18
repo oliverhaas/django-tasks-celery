@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC
+
 import pytest
 from celery.states import FAILURE, PENDING, RECEIVED, RETRY, REVOKED, STARTED, SUCCESS
 from django.tasks.base import TaskResultStatus
@@ -90,3 +92,21 @@ class TestMetaToTaskResult:
         meta = {"status": SUCCESS, "result": 42}
         result = meta_to_task_result("abc-123", meta)
         assert result.worker_ids == []
+
+    def test_failure_meta_with_string_exception(self):
+        """Some result backends store exceptions as strings instead of objects."""
+        meta = {"status": FAILURE, "result": "builtins.ValueError", "traceback": "Traceback..."}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.status == TaskResultStatus.FAILED
+        assert len(result.errors) == 1
+        assert result.errors[0].exception_class_path == "builtins.ValueError"
+        assert result.errors[0].traceback == "Traceback..."
+
+    def test_failure_meta_with_datetime_object(self):
+        """date_done can be a datetime object (not just a string)."""
+        from datetime import datetime
+
+        dt = datetime(2025, 6, 1, 12, 0, 0, tzinfo=UTC)
+        meta = {"status": FAILURE, "result": ValueError("err"), "date_done": dt}
+        result = meta_to_task_result("abc-123", meta)
+        assert result.finished_at == dt

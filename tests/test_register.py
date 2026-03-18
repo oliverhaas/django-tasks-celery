@@ -57,6 +57,21 @@ class TestEnsureCeleryTask:
         ensure_celery_task(async_task, celery_app, backend)
         assert async_task.module_path in celery_app.tasks
 
+    def test_registers_on_non_finalized_app(self, backend):
+        """Tasks can be registered on a non-finalized Celery app."""
+        app = Celery("test_not_finalized")
+        app.config_from_object(
+            {
+                "broker_url": "memory://",
+                "result_backend": "cache+memory://",
+            },
+        )
+        # Don't finalize yet
+        ensure_celery_task(simple_task, app, backend)
+        # Finalize to trigger pending registrations
+        app.finalize()
+        assert simple_task.module_path in app.tasks
+
 
 class TestAutoRegistration:
     """Tasks should be auto-registered with Celery during validate_task (worker discovery)."""

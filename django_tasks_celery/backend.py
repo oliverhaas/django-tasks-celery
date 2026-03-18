@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
@@ -13,6 +14,8 @@ from django.utils.module_loading import import_string
 
 from django_tasks_celery.register import ensure_celery_task
 from django_tasks_celery.results import meta_to_task_result
+
+logger = logging.getLogger(__name__)
 
 
 def map_priority(django_priority: int) -> int:
@@ -57,7 +60,7 @@ class CeleryBackend(BaseTaskBackend):
         except Exception:
             # Registration is best-effort at validate time.
             # It will succeed later at enqueue() time.
-            pass
+            logger.debug("Could not register task %s with Celery during validation", task.module_path, exc_info=True)
 
     def _build_send_options(self, task: Task[..., Any]) -> dict[str, Any]:
         """Build options dict for Celery's apply_async().
@@ -114,8 +117,8 @@ class CeleryBackend(BaseTaskBackend):
         app = self._get_celery_app()
         meta = app.backend.get_task_meta(result_id)
 
-        # Look up the Django Task from our registry via the Celery task name
-        # (requires CELERY_RESULT_EXTENDED = True for task_name in metadata)
+        # Look up the Django Task from our registry via the Celery task name.
+        # Prefers "task_name" (some backends), falls back to "name" (extended results).
         task_name = meta.get("task_name") or meta.get("name")
         task = _django_task_registry.get(task_name) if task_name else None
 
