@@ -1,4 +1,11 @@
-"""Task registration: bridge Django @task functions into Celery's task registry."""
+"""Task registration: bridge Django @task functions into Celery's task registry.
+
+Note on private Celery API usage:
+    This module uses Celery internals (_task_from_fun, _finalize_mutex,
+    connect_on_app_finalize) because there is no public API for dynamic
+    task registration at runtime. Celery's own shared_task() uses the
+    same internals. These are stable across Celery 5.x.
+"""
 
 from __future__ import annotations
 

@@ -44,15 +44,15 @@ jobs:
           - "3.14"
         django-version:
           - "6.0"
-        celery-version:
-          - "5.4"
-          - "5.5"
+        celery-impl:
+          - celery
+          - celery-asyncio
 
         include:
           # Pre-release Django
           - python-version: "3.14"
             django-version: "main"
-            celery-version: "5.5"
+            celery-impl: "celery"
 
     steps:
       - uses: actions/checkout@v6
@@ -74,15 +74,37 @@ jobs:
             uv pip install "Django~=${{ matrix.django-version }}.0"
           fi
 
-      - name: Install Celery ${{ matrix.celery-version }}
-        run: uv pip install "celery~=${{ matrix.celery-version }}.0"
+      - name: Install Celery implementation
+        run: |
+          if [ "${{ matrix.celery-impl }}" = "celery-asyncio" ]; then
+            uv pip install "celery-asyncio>=6.0.0a1"
+          else
+            uv pip install "celery>=5.4,<6"
+          fi
 
       - name: Run tests
         run: uv run pytest
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.13' && matrix.django-version == '6.0' && matrix.celery-version == '5.5'
+        if: matrix.python-version == '3.13' && matrix.django-version == '6.0' && matrix.celery-impl == 'celery'
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
+
+  test-redis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Set up Python
+        run: uv python install 3.14
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run Redis integration tests
+        run: uv run pytest -m redis --no-cov

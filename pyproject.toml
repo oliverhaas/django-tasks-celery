@@ -47,7 +47,9 @@ dev = [
   "pytest-django==4.12.0",
   "pytest-mock==3.15.1",
   "pytest==9.0.2",
+  "redis>=5",
   "ruff==0.15.6",
+  "testcontainers[redis]>=4.10",
   "ty==0.0.23",
 ]
 docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.5", "mike==2.1.4"]
@@ -97,6 +99,9 @@ allow-star-arg-any = true
 suppress-none-returning = true
 
 [tool.ruff.lint.per-file-ignores]
+"tests/redis_integration/**" = [
+  "INP001", # No __init__.py — would shadow the redis package since tests/ is in PYTHONPATH
+]
 "tests/**" = [
   "ANN",    # Type annotations not required in tests
   "ARG",    # Unused arguments common in fixtures
@@ -131,6 +136,10 @@ django_settings_module = "tests.settings.base"
 module = "celery.*"
 ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = "testcontainers.*"
+ignore_missing_imports = true
+
 [tool.ty.rules]
 invalid-method-override = "ignore"
 
@@ -160,10 +169,11 @@ invalid-assignment = "ignore"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "settings.base"
-addopts = "--cov=django_tasks_celery --cov-report=term-missing --cov-report=xml --no-cov-on-fail"
+addopts = "--cov=django_tasks_celery --cov-report=term-missing --cov-report=xml --no-cov-on-fail -m 'not redis'"
 pythonpath = ["tests"]
 testpaths = ["tests"]
 xfail_strict = true
+markers = ["redis: tests requiring a real Redis instance (via testcontainers)"]
 
 [tool.coverage.run]
 omit = ["tests/*"]

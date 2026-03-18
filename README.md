@@ -1,7 +1,5 @@
 # django-tasks-celery
 
-> **Exploratory / Alpha** — This package is an early-stage exploration of a Celery backend for Django's `django.tasks` framework. It is **not yet production-ready**. APIs may change without notice. Use at your own risk.
-
 Celery backend for Django 6.0's built-in `django.tasks` framework. Implements `BaseTaskBackend` so that `@task` / `enqueue()` dispatches to Celery workers.
 
 ## Installation
