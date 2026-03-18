@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from datetime import UTC, datetime
-from typing import Any, ParamSpec, TypeVar
+from typing import Any
 
 from django.core import checks
 from django.tasks.backends.base import BaseTaskBackend
@@ -14,9 +13,6 @@ from django.utils.module_loading import import_string
 
 from django_tasks_celery.register import ensure_celery_task
 from django_tasks_celery.results import meta_to_task_result
-
-T = TypeVar("T")
-P = ParamSpec("P")
 
 
 def map_priority(django_priority: int) -> int:
@@ -30,7 +26,7 @@ class CeleryBackend(BaseTaskBackend):
     supports_priority = True
 
     @property
-    def supports_get_result(self) -> bool:
+    def supports_get_result(self) -> bool:  # type: ignore[override]
         try:
             from celery.backends.base import DisabledBackend
 
@@ -82,12 +78,7 @@ class CeleryBackend(BaseTaskBackend):
 
         return options
 
-    def enqueue(
-        self,
-        task: Task[P, T],
-        args: Any,
-        kwargs: Any,
-    ) -> TaskResult[T]:
+    def enqueue(self, task: Task[..., Any], args: Any, kwargs: Any) -> TaskResult[..., Any]:
         self.validate_task(task)
         app = self._get_celery_app()
         ensure_celery_task(task, app, self)
@@ -117,7 +108,7 @@ class CeleryBackend(BaseTaskBackend):
         task_enqueued.send(sender=type(self), task_result=task_result)
         return task_result
 
-    def get_result(self, result_id: str) -> TaskResult[Any]:
+    def get_result(self, result_id: str) -> TaskResult[..., Any]:
         from django_tasks_celery.register import _django_task_registry
 
         app = self._get_celery_app()
@@ -135,7 +126,7 @@ class CeleryBackend(BaseTaskBackend):
             backend_alias=self.alias,
         )
 
-    def check(self, **kwargs: Any) -> Iterable[checks.CheckMessage]:
+    def check(self, **kwargs: Any) -> list[checks.CheckMessage]:
         messages: list[checks.CheckMessage] = []
 
         try:

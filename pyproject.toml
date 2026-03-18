@@ -131,15 +131,6 @@ django_settings_module = "tests.settings.base"
 module = "celery.*"
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-module = "django.tasks.*"
-ignore_missing_imports = true
-follow_untyped_imports = false
-
-[[tool.mypy.overrides]]
-module = "testcontainers.*"
-ignore_missing_imports = true
-
 [tool.ty.rules]
 invalid-method-override = "ignore"
 
@@ -150,11 +141,14 @@ python-version = "3.13"
 respect-type-ignore-comments = false
 
 [[tool.ty.overrides]]
-# django.tasks is new in Django 6.0 and not yet recognized by ty
+# django.tasks stubs not yet fully recognized by ty
 include = ["django_tasks_celery/**"]
 
 [tool.ty.overrides.rules]
 unresolved-import = "ignore"
+unresolved-attribute = "ignore"
+invalid-argument-type = "ignore"
+invalid-type-arguments = "ignore"
 
 [[tool.ty.overrides]]
 include = ["tests/**"]

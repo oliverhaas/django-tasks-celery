@@ -32,7 +32,7 @@ def meta_to_task_result(
     meta: dict[str, Any],
     task: Task[..., Any] | None = None,
     backend_alias: str = "default",
-) -> TaskResult[Any]:
+) -> TaskResult[..., Any]:
     """Convert Celery task metadata to a Django TaskResult."""
     status = map_celery_state(meta.get("status", PENDING))
 
@@ -66,7 +66,7 @@ def meta_to_task_result(
     worker_ids = [worker] if worker else []
 
     result = TaskResult(
-        task=task,
+        task=task,  # type: ignore[arg-type]  # task may be None when extended results are disabled
         id=result_id,
         status=status,
         enqueued_at=None,
