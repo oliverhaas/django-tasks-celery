@@ -52,7 +52,7 @@ dev = [
   "testcontainers[redis]>=4.10",
   "ty==0.0.25",
 ]
-docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.5", "mike==2.1.4"]
+docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.6", "mike==2.1.4"]
 
 [build-system]
 requires = ["hatchling"]
