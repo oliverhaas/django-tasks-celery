@@ -50,7 +50,7 @@ dev = [
   "redis>=5",
   "ruff==0.15.8",
   "testcontainers[redis]>=4.10",
-  "ty==0.0.25",
+  "ty==0.0.27",
 ]
 docs = ["mkdocs==1.6.1", "mkdocs-material==9.7.6", "mike==2.1.4"]
 
