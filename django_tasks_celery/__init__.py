@@ -3,4 +3,4 @@
 from django_tasks_celery.backend import CeleryBackend
 
 __all__ = ["CeleryBackend"]
-__version__ = "0.1.0"
+__version__ = "0.1.1"

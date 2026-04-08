@@ -1,10 +1,11 @@
 # Changelog
 
-## 0.1.0 (2026-04-08)
+## 0.1.1 (2026-04-08)
 
 First stable release.
 
 - No API changes from 0.1.0a2
+- Version 0.1.0 was burned on PyPI during early development
 
 ## 0.1.0a2 (2026-03-15)
 
