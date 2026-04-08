@@ -1,0 +1,15 @@
+[project]
+name = "django-tasks-celery-example"
+version = "0.0.0"
+description = "Example project for django-tasks-celery"
+requires-python = ">=3.12"
+dependencies = [
+    "django-tasks-celery[celery]",
+    "redis>=5",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+django-tasks-celery = { path = "../..", editable = true }

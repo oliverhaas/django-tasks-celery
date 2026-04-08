@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0 (2026-04-08)
+
+First stable release.
+
+- No API changes from 0.1.0a2
+
 ## 0.1.0a2 (2026-03-15)
 
 Initial alpha release.

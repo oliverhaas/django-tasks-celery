@@ -1,23 +1,28 @@
-"""Run example tasks with an in-process Celery worker (no external Redis needed)."""
+"""Run example tasks with an in-process Celery worker (no external Redis needed).
+
+This creates a standalone Celery app configured for eager mode (in-process
+execution) so no broker or result backend is needed.
+"""
 
 import os
 import sys
 
-# Django setup
-os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 sys.path.insert(0, os.path.dirname(__file__))
+os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
 
 import django
 
 django.setup()
 
-from celery_app import app  # noqa: E402
-from tasks import add, failing_example, greet, multiply  # noqa: E402
+from celery import Celery  # noqa: E402
 
 from django_tasks_celery.backend import CeleryBackend  # noqa: E402
 from django_tasks_celery.register import ensure_celery_task  # noqa: E402
 
-# Configure for eager mode (in-process execution, no broker needed)
+from tasks import add, failing_example, greet, multiply  # noqa: E402
+
+# Create a standalone Celery app for in-process execution (no Redis needed)
+app = Celery("simple_example")
 app.conf.update(
     task_always_eager=True,
     task_eager_propagates=False,
@@ -30,7 +35,7 @@ app.conf.update(
 # Create backend and register tasks
 backend = CeleryBackend(
     alias="default",
-    params={"QUEUES": ["default"], "OPTIONS": {"CELERY_APP": "celery_app.app"}},
+    params={"QUEUES": ["default"]},
 )
 for t in [add, multiply, greet, failing_example]:
     ensure_celery_task(t, app, backend)

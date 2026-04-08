@@ -1,4 +1,4 @@
-"""CeleryBackend — Celery backend for Django's task framework."""
+"""CeleryBackend: Celery backend for Django's task framework."""
 
 from __future__ import annotations
 
@@ -50,7 +50,7 @@ class CeleryBackend(BaseTaskBackend):
         """Validate and register the task with Celery.
 
         This runs during Task.__post_init__ (at import time), ensuring tasks
-        are registered with Celery in both web and worker processes — solving
+        are registered with Celery in both web and worker processes, solving
         worker-side task discovery.
         """
         super().validate_task(task)

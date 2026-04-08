@@ -33,7 +33,7 @@ def ensure_celery_task(task: Task[..., Any], celery_app: Any, backend: CeleryBac
     """Register a Django @task as a Celery task if not already registered.
 
     All operations are idempotent, so concurrent calls for the same task are safe
-    without locking — at worst a duplicate (harmless) callback is registered.
+    without locking. At worst a duplicate (harmless) callback is registered.
     """
     celery_name = task.module_path
     if celery_name in _django_task_registry:
