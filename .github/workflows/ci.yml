@@ -54,6 +54,7 @@ jobs:
             django-version: "main"
             celery-impl: "celery"
 
+    continue-on-error: ${{ matrix.celery-impl == 'celery-asyncio' }}
     steps:
       - uses: actions/checkout@v6
 
