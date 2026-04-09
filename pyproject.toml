@@ -29,7 +29,7 @@ dependencies = ["Django>=6.0,<7"]
 
 [project.optional-dependencies]
 celery = ["celery>=5.4,<6"]
-celery-asyncio = ["celery-asyncio>=6.0.0a1"]
+celery-asyncio = ["celery-asyncio>=6.0.0a2"]
 
 [project.urls]
 Homepage = "https://github.com/oliverhaas/django-tasks-celery"
