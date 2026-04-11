@@ -30,3 +30,4 @@ site/
 *.sqlite3
 examples/*/.venv/
 examples/*/uv.lock
+docs/superpowers/
