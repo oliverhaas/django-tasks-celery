@@ -41,7 +41,7 @@ Changelog = "https://oliverhaas.github.io/django-tasks-celery/reference/changelo
 dev = [
   "celery>=5.4,<6",
   "django-stubs==6.0.2",
-  "mypy==1.20.0",
+  "mypy==1.20.1",
   "pre-commit==4.5.1",
   "pytest-cov==7.1.0",
   "pytest-django==4.12.0",
