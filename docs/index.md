@@ -35,9 +35,10 @@ TASKS = {
 ```python
 from django.tasks import task
 
+
 @task
-def send_email(to, subject, body):
-    ...
+def send_email(to, subject, body): ...
+
 
 result = send_email.enqueue(to="user@example.com", subject="Hello", body="World")
 ```

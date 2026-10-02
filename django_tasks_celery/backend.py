@@ -81,7 +81,7 @@ class CeleryBackend(BaseTaskBackend):
 
         return options
 
-    def enqueue(self, task: Task[..., Any], args: Any, kwargs: Any) -> TaskResult[..., Any]:
+    def enqueue[**P, R](self, task: Task[P, R], args: Any, kwargs: Any) -> TaskResult[P, R]:
         self.validate_task(task)
         app = self._get_celery_app()
         ensure_celery_task(task, app, self)

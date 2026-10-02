@@ -78,6 +78,7 @@ ignore = [
   "ARG002",  # Unused args: API compat with BaseTaskBackend
   "BLE001",  # Broad exception catching needed for resilient check() and supports_get_result
   "COM812",  # Conflicts with ruff-format
+  "CPY",     # No per-file copyright notices in this project
   "D",       # Docstrings - will add incrementally
   "E501",    # Line length handled by config
   "EM",      # Exception strings inline are fine

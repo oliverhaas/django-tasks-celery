@@ -38,10 +38,12 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 # myapp/tasks.py
 from django.tasks import task
 
+
 @task
 def send_email(to: str, subject: str, body: str) -> str:
     # ... send the email ...
     return f"Sent to {to}"
+
 
 @task(priority=10, queue_name="default")
 def process_payment(order_id: int) -> dict:
@@ -56,7 +58,7 @@ from myapp.tasks import send_email
 
 # Fire and forget
 result = send_email.enqueue(to="user@example.com", subject="Hello", body="World")
-print(result.id)      # UUID
+print(result.id)  # UUID
 print(result.status)  # TaskResultStatus.READY
 
 # Retrieve result later (requires CELERY_RESULT_EXTENDED = True)

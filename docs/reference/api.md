@@ -41,8 +41,8 @@ Maps Django priority range (-100 to 100) to Celery/AMQP priority range (0 to 255
 from django_tasks_celery.backend import map_priority
 
 map_priority(-100)  # 0 (lowest)
-map_priority(0)     # 128 (default)
-map_priority(100)   # 255 (highest)
+map_priority(0)  # 128 (default)
+map_priority(100)  # 255 (highest)
 ```
 
 ## Signals
