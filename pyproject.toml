@@ -42,7 +42,7 @@ dev = [
   "celery>=5.4,<6",
   "django-stubs==6.1.2",
   "mypy==2.4.0",
-  "pre-commit==4.6.2",
+  "pre-commit==4.7.0",
   "pytest-cov==7.1.0",
   "pytest-django==4.14.0",
   "pytest-mock==3.16.0",
